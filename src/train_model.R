@@ -37,12 +37,11 @@ source("parameters.R")
 
 
 # load the data. We don't need most of the columns in it, and we need to clean the strings.
-pet_data <- 
-  read_csv("seattle_pet_licenses.csv", 
-           col_types = cols_only(`Animal's Name` = col_character(),
-             Species = col_character(),
-             `Primary Breed` = col_character(),
-             `Secondary Breed` = col_character())) %>%
+pet_data <- read_csv("seattle_pet_licenses.csv", 
+                     col_types = cols_only(`Animal's Name` = col_character(),
+                                           Species = col_character(),
+                                           `Primary Breed` = col_character(),
+                                           `Secondary Breed` = col_character())) %>%
   rename(name = `Animal's Name`,
          species = `Species`,
          primary_breed = `Primary Breed`,
@@ -61,10 +60,8 @@ pet_data <-
 # finally we make them sequences of the same length. So they can form a matrix
 
 # the subsequence data
-subsequence_data <-
-  pet_data %>%
-  mutate(tokenized_name = 
-           name %>%
+subsequence_data <- pet_data %>%
+  mutate(tokenized_name = name %>%
            str_c("+") %>% # add a stop character
            str_split(""),
          accumulated_name = 
@@ -80,8 +77,7 @@ x_species <-
   pull(species)
 
 # the name data as a matrix. This will then have the last character split off to be the y data
-text_matrix <-
-  subsequence_data %>%
+text_matrix <-subsequence_data %>%
   pull(accumulated_name) %>%
   map(~ character_lookup$character_id[match(.x,character_lookup$character)]) %>%
   pad_sequences(maxlen = max_length+1) %>%
@@ -97,17 +93,14 @@ y_name <- text_matrix[,max_length+1,]
 
 species_input <- layer_input(shape = c(1), name = "species_input")
 
-previous_letters_input <- 
-  layer_input(shape = c(max_length,num_characters), name = "previous_letters_input") 
+previous_letters_input <- layer_input(shape = c(max_length,num_characters), name = "previous_letters_input") 
 
 # the name data needs to be processed using an LSTM, Check out Deep Learning with R (Chollet & Allaire, 2018) to learn more.
-previous_letters_lstm <- 
-  previous_letters_input %>%
+previous_letters_lstm <- previous_letters_input %>%
   layer_lstm(input_shape = c(max_length,num_characters), units=32, name="previous_letters_lstm")
 
 # this combines the inputs and adds a few more layers
-output <- 
-  layer_concatenate(c(previous_letters_lstm, species_input)) %>%
+output <- layer_concatenate(c(previous_letters_lstm, species_input)) %>%
   layer_dropout(0.2) %>%
   layer_dense(32,name="joined_dense") %>%
   layer_dropout(0.2) %>%

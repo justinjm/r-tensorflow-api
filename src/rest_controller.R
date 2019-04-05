@@ -29,14 +29,15 @@ model <- load_model_hdf5("model.h5")
 
 # Set an endpoint to return a pet name
 #* @get /name
-get_name <- function(species="",start=""){
+get_name <- function(species="",
+                     start=""){
   species <- tolower(species)
+  
   if(species == ""){
     species <- sample(c("cat","dog"),1)
   }
   
-  start <- 
-    start %>%
+  start <- start %>%
     stringi::stri_trans_tolower() %>%
     str_remove_all("[^ \\.-[a-zA-Z]]+")
   

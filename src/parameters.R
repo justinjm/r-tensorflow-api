@@ -14,8 +14,7 @@
 # limitations under the License.
 # =========================================================================
 
-character_lookup <-
-  data_frame(character = c(letters,".","-"," ","+")) %>% 
+character_lookup <- data_frame(character = c(letters,".","-"," ","+")) %>% 
   mutate(character_id = row_number())
 
 max_length <- 10

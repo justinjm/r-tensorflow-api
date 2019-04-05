@@ -14,14 +14,19 @@
 # limitations under the License.
 # =========================================================================
 
-generate_name <- function(species, starting_text="", model, character_lookup, max_length,temperature=1){
-  choose_next_char <- function(preds, character_lookup,temperature = 1){
+generate_name <- function(species, 
+                          starting_text="", 
+                          model, 
+                          character_lookup, 
+                          max_length,temperature=1){
+  choose_next_char <- function(preds,
+                               character_lookup,
+                               temperature = 1){
     preds <- log(preds)/temperature
     exp_preds <- exp(preds)
     preds <- exp_preds/sum(exp(preds))
     
-    next_index <- 
-      rmultinom(1, 1, preds) %>% 
+    next_index <- rmultinom(1, 1, preds) %>% 
       as.integer() %>%
       which.max()
     character_lookup$character[next_index-1]
@@ -34,8 +39,7 @@ generate_name <- function(species, starting_text="", model, character_lookup, ma
   
 
   while(continue){
-    previous_letters_data <- 
-      in_progress_name %>%
+    previous_letters_data <- in_progress_name %>%
       list() %>%
       map(~ character_lookup$character_id[match(.x,character_lookup$character)]) %>%
       pad_sequences(maxlen = max_length) %>%
